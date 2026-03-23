@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Bresenham_Line_OpenGL.vcxproj" Id="6f03033f-5d5f-4041-a875-f5cb6d907fe3" />
+</Solution>

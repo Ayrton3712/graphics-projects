@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="DDA_OpenGL_Implementation.vcxproj" Id="ef9b3bf7-6078-4aae-b4c9-33de723154e5" />
+</Solution>
