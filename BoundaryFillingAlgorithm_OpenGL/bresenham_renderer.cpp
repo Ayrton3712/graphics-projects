@@ -1,6 +1,7 @@
 #include "Point.h"
 #include "bresenham_circle.h"
 #include "normalize.h"
+#include "boundary_filling_algorithm.h"
 
 #include <iostream>
 #include <vector>
@@ -43,24 +44,40 @@ int main() {
 
 	// Generating point vertices
 	std::vector<Point> points;
-	BresenhamCircle(0, 550, points); // center (0,0), radius = 5 (integer grid)
+	BresenhamCircle(0, 5, points);
+
+	GLfloat fillColors[4] = { 1.0f, 0.5f, 0.2f, 1.0f }; // RGBA color for filling
+
+	std::vector<Point> fill = boundary_filling_algorithm(Point(0, 0), fillColors, WIDTH, HEIGHT, points);
 
 	// Normalizing points to fit within the NDC range of [-1, 1]
 	for (size_t i = 0; i < points.size(); i++) {
-		points[i].normalizePoint((float)WIDTH, (float)HEIGHT);
+		points[i].normalizePoint(10.0f, 7.5f);
+	}
+	for (size_t i = 0; i < fill.size(); i++) {
+		fill[i].normalizePoint(10.0f, 7.5f);
 	}
 
-	// If you want to draw a filled circle with GL_TRIANGLE_FAN, you need a center vertex then perimeter vertices in order.
-	// Here I'll create the vertex buffer for perimeter only (for GL_POINTS or GL_LINE_LOOP).
-	GLfloat* vertices = new GLfloat[points.size() * 3];
+	// Allocate combined vertex buffer for boundary + fill points
+	size_t totalPoints = points.size() + fill.size();
+	GLfloat* vertices = new GLfloat[totalPoints * 3];
+
+	// Copy boundary points
 	for (size_t i = 0; i < points.size(); i++) {
 		vertices[i * 3]     = points[i].getX(); // x
 		vertices[i * 3 + 1] = points[i].getY(); // y
 		vertices[i * 3 + 2] = 0.0f;             // z
 	}
+	// Copy filled points after boundary points
+	for (size_t i = 0; i < fill.size(); i++) {
+		size_t base = (points.size() * 3) + (i * 3);
+		vertices[base]     = fill[i].getX(); // x
+		vertices[base + 1] = fill[i].getY(); // y
+		vertices[base + 2] = 0.0f;           // z
+	}
 
 	// Creating the window object
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Bresenham Circle", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Boundary Filling Algorithm", nullptr, nullptr);
 	if (window == nullptr) {
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -102,7 +119,8 @@ int main() {
 
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, points.size() * 3 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+	// IMPORTANT: upload the full vertex buffer (boundary + fill)
+	glBufferData(GL_ARRAY_BUFFER, totalPoints * 3 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -124,7 +142,8 @@ int main() {
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
 
-		glDrawArrays(GL_POINTS, 0, (GLsizei)points.size());
+		// Draw all points (boundary + fill)
+		glDrawArrays(GL_POINTS, 0, (GLsizei)totalPoints);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

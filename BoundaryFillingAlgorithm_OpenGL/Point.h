@@ -19,4 +19,8 @@ public:
 	// Setters
 	void setX(GLfloat);
 	void setY(GLfloat);
+
+	// Overloading == and !=
+	bool operator==(const Point& other) const;
+	bool operator!=(const Point& other) const;
 };
