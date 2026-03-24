@@ -47,7 +47,7 @@ int main() {
 
 	// Normalizing points to fit within the NDC range of [-1, 1]
 	for (size_t i = 0; i < points.size(); i++) {
-		points[i].normalizePoint(800.0f, 600.0f);
+		points[i].normalizePoint((float)WIDTH, (float)HEIGHT);
 	}
 
 	// If you want to draw a filled circle with GL_TRIANGLE_FAN, you need a center vertex then perimeter vertices in order.
