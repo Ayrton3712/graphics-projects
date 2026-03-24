@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="BoundaryFillingAlgorithm_OpenGL.vcxproj" />
+  <Project Path="BoundaryFillingAlgorithm_OpenGL.vcxproj" Id="efc454b2-bc78-426b-b3fd-4ffa3990a382" />
 </Solution>

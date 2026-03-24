@@ -10,22 +10,26 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-// GLSL source code for the vertex shader
+// GLSL source code for the vertex shader. Modified to include color attribute and point size uniform
 const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
+"layout(location = 0) in vec3 aPos;\n"
+"layout(location = 1) in vec3 aColor;\n"
+"out vec3 ourColor;\n"
 "uniform float pointSize;\n"
 "void main()\n"
 "{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"   gl_PointSize = pointSize;\n"
+"	gl_Position = vec4(aPos, 1.0);\n"
+"	gl_PointSize = pointSize;\n"
+"	ourColor = aColor;\n"
 "}\0";
 
-// GLSL source code for the fragment shader
+// GLSL source code for the fragment shader. Modified to include color attribute
 const char* fragmentShaderSource = "#version 330 core\n"
+"in vec3 ourColor;\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"FragColor = vec4(ourColor, 1.0);\n"
 "}\n\0";
 
 // Window dimensions
@@ -44,15 +48,19 @@ int main() {
 
 	// Generating point vertices
 	std::vector<Point> points;
-	BresenhamCircle(0, 5, points);
+	BresenhamCircle(0, 550, points);
+
+	//std::cout << "Reached\n";
 
 	GLfloat fillColors[4] = { 1.0f, 0.5f, 0.2f, 1.0f }; // RGBA color for filling
 
-	std::vector<Point> fill = boundary_filling_algorithm(Point(0, 0), fillColors, WIDTH, HEIGHT, points);
+	std::vector<Point> fill = boundary_filling_algorithm(Point(0, 0), fillColors, 800, 600, points);
+
+	//std::cout << "Reached\n";
 
 	// Normalizing points to fit within the NDC range of [-1, 1]
 	for (size_t i = 0; i < points.size(); i++) {
-		points[i].normalizePoint(10.0f, 7.5f);
+		points[i].normalizePoint(800.0f, 600.0f);
 	}
 	for (size_t i = 0; i < fill.size(); i++) {
 		fill[i].normalizePoint(10.0f, 7.5f);
@@ -60,21 +68,35 @@ int main() {
 
 	// Allocate combined vertex buffer for boundary + fill points
 	size_t totalPoints = points.size() + fill.size();
-	GLfloat* vertices = new GLfloat[totalPoints * 3];
+	GLfloat* vertices = new GLfloat[totalPoints * 6];
 
-	// Copy boundary points
+	// Boundary points: WHITE
 	for (size_t i = 0; i < points.size(); i++) {
-		vertices[i * 3]     = points[i].getX(); // x
-		vertices[i * 3 + 1] = points[i].getY(); // y
-		vertices[i * 3 + 2] = 0.0f;             // z
+		size_t base = i * 6;
+		vertices[base] = points[i].getX();
+		vertices[base + 1] = points[i].getY();
+		vertices[base + 2] = 0.0f;
+
+		vertices[base + 3] = 1.0f; // R
+		vertices[base + 4] = 1.0f; // G
+		vertices[base + 5] = 1.0f; // B
 	}
-	// Copy filled points after boundary points
+
+	//std::cout << "Reached\n";
+
+	// Fill points: ORANGE
 	for (size_t i = 0; i < fill.size(); i++) {
-		size_t base = (points.size() * 3) + (i * 3);
-		vertices[base]     = fill[i].getX(); // x
-		vertices[base + 1] = fill[i].getY(); // y
-		vertices[base + 2] = 0.0f;           // z
+		size_t base = (points.size() + i) * 6;
+		vertices[base] = fill[i].getX();
+		vertices[base + 1] = fill[i].getY();
+		vertices[base + 2] = 0.0f;
+
+		vertices[base + 3] = 1.0f;
+		vertices[base + 4] = 0.5f;
+		vertices[base + 5] = 0.2f;
 	}
+
+	//std::cout << "Reached\n";
 
 	// Creating the window object
 	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Boundary Filling Algorithm", nullptr, nullptr);
@@ -122,8 +144,11 @@ int main() {
 	// IMPORTANT: upload the full vertex buffer (boundary + fill)
 	glBufferData(GL_ARRAY_BUFFER, totalPoints * 3 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	// Unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
