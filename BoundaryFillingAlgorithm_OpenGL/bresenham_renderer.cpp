@@ -46,15 +46,18 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+	GLfloat radius = 5.0f;
+
 	// Generating point vertices
 	std::vector<Point> points;
-	BresenhamCircle(0, 5, points);
+	BresenhamCircle(0, radius, points);
 
 	//std::cout << "Reached\n";
 
 	GLfloat fillColor[4] = { 1.0f, 0.5f, 0.2f, 1.0f }; // RGBA color for filling
 
-	std::vector<Point> fill = boundary_filling_algorithm(Point(0, 0), 800, 600, points);
+	std::vector<Point> fill;
+	boundary_filling_algorithm(Point(0, 0), points, fill, radius);
 
 	//std::cout << "Reached\n";
 
@@ -83,6 +86,9 @@ int main() {
 		vertices[base + 3] = 1.0f; // R
 		vertices[base + 4] = 1.0f; // G
 		vertices[base + 5] = 1.0f; // B
+
+		std::cout << "Added boundary point: ";
+		points[i].displayPoint();
 	}
 
 	//std::cout << "Reached\n";
@@ -94,9 +100,13 @@ int main() {
 		vertices[base + 1] = fill[i].getY();
 		vertices[base + 2] = 0.0f;
 
-		vertices[base + 3] = fillColor[0];
-		vertices[base + 4] = fillColor[1];
-		vertices[base + 5] = fillColor[3];
+		vertices[base + 3] = fillColor[0];	// R
+		vertices[base + 4] = fillColor[1];	// G
+		vertices[base + 5] = fillColor[2];	// B
+		vertices[base + 6] = fillColor[3];	// A
+
+		std::cout << "Added fill point: ";
+		fill[i].displayPoint();
 	}
 
 	//std::cout << "Reached\n";
@@ -145,7 +155,7 @@ int main() {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	// IMPORTANT: upload the full vertex buffer (boundary + fill)
-	glBufferData(GL_ARRAY_BUFFER, totalPoints * 3 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, totalPoints * 6 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
