@@ -46,7 +46,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLfloat radius = 5.0f;
+	GLfloat radius = 30.0f;
 
 	// Generating point vertices
 	std::vector<Point> points;
@@ -62,8 +62,8 @@ int main() {
 	//std::cout << "Reached\n";
 
 	// Storing normalization factors as constants for clarity and maintainability
-	const GLfloat normalizationX = 10.0f;
-	const GLfloat normalizationY = 7.5f;
+	const GLfloat normalizationX = 100.0f;
+	const GLfloat normalizationY = 70.5f;
 	// Normalizing points to fit within the NDC range of [-1, 1]
 	for (size_t i = 0; i < points.size(); i++) {
 		points[i].normalizePoint(normalizationX, normalizationY);
@@ -87,7 +87,7 @@ int main() {
 		vertices[base + 4] = 1.0f; // G
 		vertices[base + 5] = 1.0f; // B
 
-		std::cout << "Added boundary point: ";
+		//std::cout << "Added boundary point: ";
 		points[i].displayPoint();
 	}
 
@@ -105,7 +105,7 @@ int main() {
 		vertices[base + 5] = fillColor[2];	// B
 		vertices[base + 6] = fillColor[3];	// A
 
-		std::cout << "Added fill point: ";
+		//std::cout << "Added fill point: ";
 		fill[i].displayPoint();
 	}
 

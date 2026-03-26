@@ -37,7 +37,7 @@ void boundary_filling_algorithm(
     // First check if the distance from the origin to start is not greater than the radius
 	GLfloat distanceFromOrigin = std::sqrt(std::pow(start.getX(), 2) + std::pow(start.getY(), 2));
 
-    if (distanceFromOrigin > radius) {
+    if (distanceFromOrigin >= radius) {
 		return; // If the point is outside the circle, we stop the recursion
     }
     
@@ -48,17 +48,12 @@ void boundary_filling_algorithm(
     foundInBoundary = std::find(boundary.begin(), boundary.end(), start) != boundary.end();
 
     if (!(foundInFill || foundInBoundary)) {
-        if (distanceFromOrigin == radius) {
-            return;
-        }
-        else {
-            fill.push_back(start);
+        fill.push_back(start);
             
-            // Recursive call for 4-connected neighbors
-            boundary_filling_algorithm(Point(start.getX() + 1, start.getY()), boundary, fill, radius);  // Right
-            boundary_filling_algorithm(Point(start.getX() - 1, start.getY()), boundary, fill, radius);  // Left
-            boundary_filling_algorithm(Point(start.getX(), start.getY() + 1), boundary, fill, radius);  // Top
-            boundary_filling_algorithm(Point(start.getX(), start.getY() - 1), boundary, fill, radius);  // Bottom
-        }
+        // Recursive call for 4-connected neighbors
+        boundary_filling_algorithm(Point(start.getX() + 1, start.getY()), boundary, fill, radius);  // Right
+        boundary_filling_algorithm(Point(start.getX() - 1, start.getY()), boundary, fill, radius);  // Left
+        boundary_filling_algorithm(Point(start.getX(), start.getY() + 1), boundary, fill, radius);  // Top
+        boundary_filling_algorithm(Point(start.getX(), start.getY() - 1), boundary, fill, radius);  // Bottom
     }
 }
