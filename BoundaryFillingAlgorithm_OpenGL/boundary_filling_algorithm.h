@@ -6,4 +6,4 @@
 // Function prototype for the boundary filling algorithm
 // Returns a vector of Points that represent the filled area
 // Takes a starting point and a fill color as an array
-std::vector<Point> boundary_filling_algorithm(const Point&, GLfloat[], const unsigned int, const unsigned int, const std::vector<Point>&);
+std::vector<Point> boundary_filling_algorithm(const Point&, const unsigned int, const unsigned int, const std::vector<Point>&);

@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{0e751294-58d6-47b5-a960-cc56b28cdc47}</ProjectGuid>
-    <RootNamespace>Bresenham_Circle_OpenGL</RootNamespace>
+    <ProjectGuid>{ef16ff26-d4b8-48cf-907a-f001800c8631}</ProjectGuid>
+    <RootNamespace>BoundaryFillingAlgorithm_OpenGL_TriangleFan</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

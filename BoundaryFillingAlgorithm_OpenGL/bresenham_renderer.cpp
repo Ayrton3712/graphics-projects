@@ -48,22 +48,25 @@ int main() {
 
 	// Generating point vertices
 	std::vector<Point> points;
-	BresenhamCircle(0, 550, points);
+	BresenhamCircle(0, 5, points);
 
 	//std::cout << "Reached\n";
 
-	GLfloat fillColors[4] = { 1.0f, 0.5f, 0.2f, 1.0f }; // RGBA color for filling
+	GLfloat fillColor[4] = { 1.0f, 0.5f, 0.2f, 1.0f }; // RGBA color for filling
 
-	std::vector<Point> fill = boundary_filling_algorithm(Point(0, 0), fillColors, 800, 600, points);
+	std::vector<Point> fill = boundary_filling_algorithm(Point(0, 0), 800, 600, points);
 
 	//std::cout << "Reached\n";
 
+	// Storing normalization factors as constants for clarity and maintainability
+	const GLfloat normalizationX = 10.0f;
+	const GLfloat normalizationY = 7.5f;
 	// Normalizing points to fit within the NDC range of [-1, 1]
 	for (size_t i = 0; i < points.size(); i++) {
-		points[i].normalizePoint(800.0f, 600.0f);
+		points[i].normalizePoint(normalizationX, normalizationY);
 	}
 	for (size_t i = 0; i < fill.size(); i++) {
-		fill[i].normalizePoint(10.0f, 7.5f);
+		fill[i].normalizePoint(normalizationX, normalizationY);
 	}
 
 	// Allocate combined vertex buffer for boundary + fill points
@@ -91,9 +94,9 @@ int main() {
 		vertices[base + 1] = fill[i].getY();
 		vertices[base + 2] = 0.0f;
 
-		vertices[base + 3] = 1.0f;
-		vertices[base + 4] = 0.5f;
-		vertices[base + 5] = 0.2f;
+		vertices[base + 3] = fillColor[0];
+		vertices[base + 4] = fillColor[1];
+		vertices[base + 5] = fillColor[3];
 	}
 
 	//std::cout << "Reached\n";

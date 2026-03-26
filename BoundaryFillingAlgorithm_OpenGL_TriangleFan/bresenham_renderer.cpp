@@ -19,12 +19,13 @@ const char* vertexShaderSource = "#version 330 core\n"
 "   gl_PointSize = pointSize;\n"
 "}\0";
 
-// GLSL source code for the fragment shader
+// GLSL source code for the fragment shader — now accepts a color uniform
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
+"uniform vec4 uColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"   FragColor = uColor;\n"
 "}\n\0";
 
 // Window dimensions
@@ -36,7 +37,6 @@ int main() {
 	glfwInit();
 
 	// Setting GLFW window hints for OpenGL major and minor versions and profile
-	// We basically tell GLFW what version of OpenGL we want to use (3.3) and what profile we want to use (core)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -50,17 +50,30 @@ int main() {
 		points[i].normalizePoint(800.0f, 600.0f);
 	}
 
-	// If you want to draw a filled circle with GL_TRIANGLE_FAN, you need a center vertex then perimeter vertices in order.
-	// Here I'll create the vertex buffer for perimeter only (for GL_POINTS or GL_LINE_LOOP).
+	// Prepend the circle center so GL_TRIANGLE_FAN renders a proper filled disk.
+	// The center must be the first vertex for the fan to work correctly.
+	Point center(0, 550);
+	center.normalizePoint(800.0f, 600.0f);
+
+	// Sort perimeter points by angle so GL_TRIANGLE_FAN connects them continuously
+	std::sort(points.begin(), points.end(), [&](const Point& a, const Point& b) {
+		float angleA = std::atan2(a.getY() - center.getY(), a.getX() - center.getX());
+		float angleB = std::atan2(b.getY() - center.getY(), b.getX() - center.getX());
+		return angleA < angleB;
+		});
+
+	points.insert(points.begin(), center);
+
+	// Build the vertex buffer (x, y, z) for each point
 	GLfloat* vertices = new GLfloat[points.size() * 3];
 	for (size_t i = 0; i < points.size(); i++) {
-		vertices[i * 3]     = points[i].getX(); // x
+		vertices[i * 3] = points[i].getX(); // x
 		vertices[i * 3 + 1] = points[i].getY(); // y
 		vertices[i * 3 + 2] = 0.0f;             // z
 	}
 
 	// Creating the window object
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Bresenham Circle", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Boundary Filling Algorithm", nullptr, nullptr);
 	if (window == nullptr) {
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -115,7 +128,10 @@ int main() {
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	glUseProgram(shaderProgram);
 	GLint pointSizeLoc = glGetUniformLocation(shaderProgram, "pointSize");
-	if (pointSizeLoc >= 0) glUniform1f(pointSizeLoc, 5.0f); // change 5.0f to preferred pixel size
+	if (pointSizeLoc >= 0) glUniform1f(pointSizeLoc, 5.0f);
+
+	// Get the color uniform location for use in the render loop
+	GLint colorLoc = glGetUniformLocation(shaderProgram, "uColor");
 
 	// Render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -124,7 +140,15 @@ int main() {
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
 
+		glLineWidth(5.0f);
+
+		// Pass 1: yellow fill using GL_TRIANGLE_FAN (center vertex is first)
+		glUniform4f(colorLoc, 1.0f, 0.0f, 0.0f, 1.0f);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, (GLsizei)points.size());
+
+		// Pass 2: orange boundary using GL_LINE_LOOP (skip center vertex at index 0)
+		glUniform4f(colorLoc, 0.0f, 0.0f, 0.8f, 1.0f);
+		glDrawArrays(GL_LINE_LOOP, 1, (GLsizei)points.size() - 1);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
