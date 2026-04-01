@@ -1,7 +1,7 @@
 #include "Point.h"
 #include "bresenham_circle.h"
 #include "normalize.h"
-#include "boundary_filling_algorithm.h"
+#include "flood_fill.h"
 
 #include <iostream>
 #include <vector>
@@ -57,7 +57,7 @@ int main() {
 	GLfloat fillColor[4] = { 1.0f, 0.5f, 0.2f, 1.0f }; // RGBA color for filling
 
 	std::vector<Point> fill;
-	boundary_filling_algorithm(Point(0, 0), points, fill, radius);
+	flood_fill(Point(0, 0), points, fill,  radius);
 
 	//std::cout << "Reached\n";
 
