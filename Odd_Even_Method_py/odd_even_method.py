@@ -89,3 +89,66 @@ def render_polygon_with_test(screen, vertices, test_point=None, pixel_size=4):
         return is_inside
     
     return None
+
+def main():
+    pygame.init()
+    
+    # Window setup
+    WIDTH, HEIGHT = 800, 600
+    PIXEL_SIZE = 4  # Each logical pixel is 4x4 screen pixels
+    
+    # Logical dimensions (in pixels)
+    LOGICAL_WIDTH = WIDTH // PIXEL_SIZE
+    LOGICAL_HEIGHT = HEIGHT // PIXEL_SIZE
+    
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Odd-Even Method")
+    clock = pygame.time.Clock()
+    
+    polygon_vertices = [
+        (20, 20),
+        (60, 20),
+        (80, 30),
+        (70, 70),
+        (30, 75),
+        (10, 50),
+    ]
+    
+    # Initial test point, changed with cursor in the window
+    test_point = (40, 40)
+    
+    font = pygame.font.Font(None, 24)
+    
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEMOTION:
+                # Update test point based on mouse position
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                test_point = (mouse_x // PIXEL_SIZE, mouse_y // PIXEL_SIZE)
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+        
+        # Render
+        is_inside = render_polygon_with_test(screen, polygon_vertices, test_point, PIXEL_SIZE)
+        
+        # Draw information
+        status_text = "INSIDE" if is_inside else "OUTSIDE"
+        status_color = GREEN if is_inside else RED
+        
+        info_text = font.render(f"Point: ({test_point[0]}, {test_point[1]}) - {status_text}", True, status_color)
+        screen.blit(info_text, (10, 10))
+        
+        help_text = font.render("Move mouse to test points. Press ESC to exit.", True, BLACK)
+        screen.blit(help_text, (10, 35))
+        
+        pygame.display.flip()
+        clock.tick(60)
+    
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
