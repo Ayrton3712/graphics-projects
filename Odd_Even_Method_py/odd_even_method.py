@@ -59,3 +59,33 @@ def odd_even_method(point, vertices, max_width=800):
     # Odd count = inside, Even count = outside
     return crossing_count % 2 == 1
 
+def render_polygon_with_test(screen, vertices, test_point=None, pixel_size=4):
+    """ Render the polygon on the pygame screen and test if a point is inside """
+    screen.fill(WHITE)
+    
+    # Draw the polygon boundary
+    boundary_pixels = draw_polygon(vertices)
+    for px, py in boundary_pixels:
+        pygame.draw.rect(screen, BLUE, (px * pixel_size, py * pixel_size, pixel_size, pixel_size))
+    
+    # Draw vertices
+    for vx, vy in vertices:
+        pygame.draw.rect(screen, RED, (vx * pixel_size - 2, vy * pixel_size - 2, 4, 4))
+    
+    # Draw test point and ray if provided
+    if test_point:
+        tx, ty = test_point
+        is_inside = odd_even_method(test_point, vertices)
+        
+        # Color based on inside/outside
+        point_color = GREEN if is_inside else RED
+        
+        # Draw the test point
+        pygame.draw.rect(screen, point_color, (tx * pixel_size - 2, ty * pixel_size - 2, 4, 4))
+        
+        # Draw the ray to the right
+        pygame.draw.line(screen, CYAN, (tx * pixel_size, ty * pixel_size), (800, ty * pixel_size), 1)
+        
+        return is_inside
+    
+    return None
