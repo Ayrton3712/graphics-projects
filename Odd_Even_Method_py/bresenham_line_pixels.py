@@ -1,14 +1,4 @@
 def bresenham_line(x1, y1, x2, y2):
-    """
-    Bresenham's line drawing algorithm.
-    
-    Args:
-        x1, y1: Starting point coordinates
-        x2, y2: Ending point coordinates
-    
-    Returns:
-        List of tuples representing pixel coordinates along the line
-    """
     pixels = []
     
     # Calculate differences
