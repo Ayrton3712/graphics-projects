@@ -6,8 +6,8 @@ def translate(points, tx, ty):
     Apply 2D translation using homogeneous coordinates.
 
     Translation matrix:
-        | 1  0  tx |
-        | 0  1  ty |
+        | 1  0  Tx |
+        | 0  1  Ty |
         | 0  0   1 |
     """
     matrix = np.array([
