@@ -121,7 +121,7 @@ def main():
     y_max = win[3] + 0.8
 
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-    fig.suptitle('Text Clipping Methods - "UPTP"', fontsize=13, fontweight="bold")
+    fig.suptitle('Text Clipping Methods', fontsize=13, fontweight="bold")
 
     for ax in axes:
         ax.set_xlim(x_min, x_max)
